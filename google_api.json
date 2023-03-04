@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "playground-tardigrade",
+  "private_key_id": "0741913d2eef35f07e384ba67fd91255d773b095",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCUg1f5cT0O0K9b\nK27YHiJoGAEa7wGOLNWVGlfGB5olb9GWtWqnLBHeAzE9Je1hCeYcPJXbu8eiSbCy\nookO6mCDtZORWnrmkG9b0H9a9586S2SGcXlWWQ3w04nmbWp0CUTHK5yGLcO4aqLQ\nYYRBSUJfcerbm7I63qXDBLi6C3/sXEOEMPO4VH5hwhlfk795tiEL5iceHmniGy5P\ny5ZMc5+J5EehrpbMHs4q7udWec3US2iNz5odq2OsS2/50ULBmvG0j03voKUcs26c\nkWerm3SnnQExmwY/BObcBbK9k3749kf+VYY6kOznfPyumgOk0q0bHo8wk81io4PE\nGw5x99PNAgMBAAECggEAIX5Srai2dLwnRBgyRi7box7Axw5+iw48+ATKJVjrEITc\nn5DYFg4oFGojZW9DjyZAnX8ja/w4THcykML7xp+gtyuQ9Y/SlmOeHbaStlUQtcCx\nkemPDCSG8ph+qfdksfkyJ/oDsbYqBRIVmInZnjCztZtXNIJzanfyqd4LfDfiOI+J\nVXvi3gDfcZOX8jrmKKbpgJ0ShvDKhLmOdrDFqRrX8EtzNETqtGZL3wScGe4/SUEK\nsq41dlL4O5p4CJwU9q9Xe0qAeUnBj3gPOrPhH5Ar1wEJpTTHJf41JkJHGLW2tzLN\nehgeg/txE0KAJafS5DzsaN+0GLqeyDyjz0uRsActIQKBgQDIj51UnRWtX7rTgW7J\n71bJ92hCwLR6JQvzO79iw1y/FZ5nvRSibhNA5uT6X3bFdR6paDcRV84WBb/zl4IH\n6d4vxPRJH6aAmPgp57v/fRdamfKtAp4qfmyNGq7dM654ooRY75mPohaLAUHsg2si\nF5H10+lEcW/OGD0chnooJJ3TYQKBgQC9kKNt0H/TP1nGIxl/0S+JmDZSWWp7l4Zd\nrz48/GVFxH1yd6zxSH6C6DTPFQfeuHJ5ot4IxkXOFrv9Q4rHzfnwZC5MXvmLGpKp\nXR3pyF0h7ULPkebOxk8b2SxgKsdO/VpWB3iSbPPd5aHAzuVqbNzM8xKDWvFPEQt5\ngrRUPwED7QKBgQCMLPwsgGH/PBJK84LodnR1Uos3ZJJ/cFcq2I6KS7sN/uEo5ll+\nsWqZiQdvCrvrhFE63BDo+TKb58biTPlf6JAXWRPX69wms0N3nnSiO97PvxuC2nqL\nfrMF6Clhh1ahEA1qT4RHhGU3IFjgInYFbO3iIAtAf/xB0mUcA81rMzRv4QKBgQCf\n0lBXh5AdtK2lxXX8M4uWwEQcTdLe/LOGTPd2R33CwpTZa1jd3Lb8+3V6mkqWVn/9\nWXlFgJTd2oEIWGeraVeue2glb3WI+BBqxl0v+4O51OWdR2+HKd8MpZ8qPSboy+Xb\n3lSjb0Rz8uTbQBRgFARcrxsOsB/+/2njOnV7Cdt7SQKBgAe6EL8gbYwacuLr/bMu\n82Bkvekr0bkyDjHRU8jzEUFncbVVPp3QHtTedFhHXHEXMryKUlX8UStHkfp01Lzq\nRAkXTSPfQIsLqIAC207rLE1E5p4PNws2vmWOAG7b8/t2syBK2ePOP9uEuC3LBk4t\nOYhX+//X24ci7dlI5o4B7Uup\n-----END PRIVATE KEY-----\n",
+  "client_email": "google-sheets@playground-tardigrade.iam.gserviceaccount.com",
+  "client_id": "113277492765067192215",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/google-sheets%40playground-tardigrade.iam.gserviceaccount.com"
+}
