@@ -1,3 +1,4 @@
+import 'package:campus_transit/widgets/error_button.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -22,7 +23,7 @@ class GetLocation extends StatefulWidget {
   State<GetLocation> createState() => _GetLocationState();
 }
 
-class _GetLocationState extends State<GetLocation> {
+class _GetLocationState extends State<GetLocation> with WidgetsBindingObserver {
   Points _closestPoint = Points.mainGate;
 
   TransportScheduleRow? _destinationOne;
@@ -32,10 +33,46 @@ class _GetLocationState extends State<GetLocation> {
 
   late Future<Position> _initLocation;
 
+  LocationPermission? _permission;
+
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     _initLocation = _initializeLocation();
     super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      Geolocator.isLocationServiceEnabled().then((value) {
+        if (value) return;
+        setState(() {
+          _initLocation = _initializeLocation();
+        });
+      });
+
+      Geolocator.checkPermission().then((value) {
+        if (value == LocationPermission.deniedForever ||
+            value == LocationPermission.denied) {
+          setState(() {
+            _permission = value;
+          });
+          return;
+        }
+        setState(() {
+          _permission = value;
+          _initLocation = _initializeLocation();
+        });
+      });
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   Future<Position> _initializeLocation() async {
@@ -101,11 +138,11 @@ class _GetLocationState extends State<GetLocation> {
   }
 
   Future<void> _enableLocationServices() async {
-    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error(LocationError('Location services are disabled.',
-          LocationErrorType.serviceDisabled));
-    }
+    await Geolocator.openLocationSettings();
+  }
+
+  Future<LocationPermission> _requestLocationPermission() async {
+    return await Geolocator.requestPermission();
   }
 
   @override
@@ -113,6 +150,15 @@ class _GetLocationState extends State<GetLocation> {
     return FutureBuilder(
       future: _initLocation,
       builder: (ctx, snapshot) {
+        if (_permission != null &&
+                _permission == LocationPermission.deniedForever ||
+            _permission == LocationPermission.denied) {
+          return ErrorButton(
+            error: "Please enable location permissions through settings",
+            buttonText: "Open Settings",
+            callBack: () => Geolocator.openAppSettings(),
+          );
+        }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: CircularProgressIndicator(),
@@ -128,30 +174,32 @@ class _GetLocationState extends State<GetLocation> {
           final errorData = snapshot.error as LocationError;
 
           if (errorData.type == LocationErrorType.serviceDisabled) {
-            return Center(
-              child: Column(
-                children: [
-                  const Text("Location services are disabled"),
-                  ElevatedButton(
-                    onPressed: _enableLocationServices,
-                    child: const Text("Enable location services"),
-                  ),
-                ],
-              ),
+            return ErrorButton(
+              callBack: () => _enableLocationServices().then((_) {
+                setState(
+                  () {},
+                );
+              }),
+              buttonText: "Enable Location Services",
+              error: "Location services are disabled",
             );
           }
 
           if (errorData.type == LocationErrorType.permissionDenied) {
-            return Center(
-              child: Column(
-                children: [
-                  const Text("Location permissions are denied"),
-                  ElevatedButton(
-                    onPressed: _initializeLocation,
-                    child: const Text("Request permissions"),
-                  ),
-                ],
-              ),
+            return ErrorButton(
+              callBack: () => _requestLocationPermission().then((val) {
+                if (val == LocationPermission.deniedForever ||
+                    val == LocationPermission.denied) {
+                  return;
+                }
+                setState(
+                  () {
+                    _initLocation = _initializeLocation();
+                  },
+                );
+              }),
+              buttonText: "Grant Location Permission",
+              error: "Location permissions are denied",
             );
           }
 
