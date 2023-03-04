@@ -93,8 +93,8 @@ class _GetLocationState extends State<GetLocation> {
     final List<TransportScheduleRow> rows = [];
 
     for (final point in otherTwoPoints) {
-      final row = await _sheetManager.nextVehicleToDrop(_closestPoint, point,
-          DateTime.now().subtract(const Duration(hours: 2)));
+      final row = await _sheetManager.nextVehicleToDrop(
+          _closestPoint, point, DateTime.now());
       rows.add(row);
     }
     return rows;
@@ -129,9 +129,14 @@ class _GetLocationState extends State<GetLocation> {
 
           if (errorData.type == LocationErrorType.serviceDisabled) {
             return Center(
-              child: ElevatedButton(
-                onPressed: _enableLocationServices,
-                child: const Text("Location services are disabled"),
+              child: Column(
+                children: [
+                  const Text("Location services are disabled"),
+                  ElevatedButton(
+                    onPressed: _enableLocationServices,
+                    child: const Text("Enable location services"),
+                  ),
+                ],
               ),
             );
           }
@@ -169,7 +174,6 @@ class _GetLocationState extends State<GetLocation> {
 
         return LayoutBuilder(builder: (context, constraints) {
           return RefreshIndicator(
-              color: const Color(0xFF514C5E),
               onRefresh: () =>
                   _getClosestPoint(snapshot.data!).then((value) => setState(() {
                         _destinationOne = value[0];
