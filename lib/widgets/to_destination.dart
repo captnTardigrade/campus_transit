@@ -18,7 +18,7 @@ class ToDestination extends StatelessWidget {
             margin: const EdgeInsets.symmetric(vertical: 40),
             child: Text(
               "To ${_destinationTwo!.destinationString}",
-              style: const TextStyle(fontSize: 16),
+              style: Theme.of(context).textTheme.bodyMedium,
             )),
       ),
     );

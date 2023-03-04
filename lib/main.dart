@@ -1,3 +1,4 @@
+import 'package:campus_transit/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_transit/widgets/get_location.dart';
 
@@ -14,7 +15,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Campus Transit',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(
+            fontSize: 16,
+          ),
+        ),
+        colorScheme: ColorScheme.fromSwatch(
+          backgroundColor: const Color(0xFFEFEFEF),
+          primarySwatch: createMaterialColor(const Color(0xFF514C5E)),
+        ),
       ),
       home: const MyHomePage(title: 'CampusTransit'),
     );
@@ -37,7 +46,6 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
-          backgroundColor: const Color(0xFF514C5E),
         ),
         body: const GetLocation(),
       ),

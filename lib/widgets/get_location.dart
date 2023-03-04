@@ -1,10 +1,11 @@
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+
+import 'package:campus_transit/utils/location_error.dart';
 import 'package:campus_transit/utils/point.dart';
 import 'package:campus_transit/utils/sheets_manager.dart';
 import 'package:campus_transit/widgets/destination_block.dart';
 import 'package:campus_transit/widgets/to_destination.dart';
-
-import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 
 final coordinates = {
   'Main Gate':
@@ -43,20 +44,23 @@ class _GetLocationState extends State<GetLocation> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
+      return Future.error(LocationError('Location services are disabled.',
+          LocationErrorType.serviceDisabled));
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
+        return Future.error(LocationError('Location permissions are denied',
+            LocationErrorType.permissionDenied));
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(LocationError(
+          'Location permissions are permanently denied, we cannot request permissions.',
+          LocationErrorType.permissionDeniedForever));
     }
 
     final currLocation = await Geolocator.getCurrentPosition();
@@ -89,11 +93,19 @@ class _GetLocationState extends State<GetLocation> {
     final List<TransportScheduleRow> rows = [];
 
     for (final point in otherTwoPoints) {
-      final row = await _sheetManager.nextVehicleToDrop(
-          _closestPoint, point, DateTime.now());
+      final row = await _sheetManager.nextVehicleToDrop(_closestPoint, point,
+          DateTime.now().subtract(const Duration(hours: 2)));
       rows.add(row);
     }
     return rows;
+  }
+
+  Future<void> _enableLocationServices() async {
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error(LocationError('Location services are disabled.',
+          LocationErrorType.serviceDisabled));
+    }
   }
 
   @override
@@ -107,6 +119,43 @@ class _GetLocationState extends State<GetLocation> {
           );
         }
         if (snapshot.hasError) {
+          if (snapshot.error.toString().contains("No vehicle found")) {
+            return const Center(
+              child: Text("No vehicle found"),
+            );
+          }
+
+          final errorData = snapshot.error as LocationError;
+
+          if (errorData.type == LocationErrorType.serviceDisabled) {
+            return Center(
+              child: ElevatedButton(
+                onPressed: _enableLocationServices,
+                child: const Text("Location services are disabled"),
+              ),
+            );
+          }
+
+          if (errorData.type == LocationErrorType.permissionDenied) {
+            return Center(
+              child: Column(
+                children: [
+                  const Text("Location permissions are denied"),
+                  ElevatedButton(
+                    onPressed: _initializeLocation,
+                    child: const Text("Request permissions"),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (errorData.type == LocationErrorType.permissionDeniedForever) {
+            return const Center(
+              child: Text("Please grant location permission through settings."),
+            );
+          }
+
           return Center(
             child: Text("${snapshot.error}"),
           );
@@ -118,35 +167,48 @@ class _GetLocationState extends State<GetLocation> {
           );
         }
 
-        return RefreshIndicator(
-            color: const Color(0xFF514C5E),
-            onRefresh: () =>
-                _getClosestPoint(snapshot.data!).then((value) => setState(() {
-                      _destinationOne = value[0];
-                      _destinationTwo = value[1];
-                    })),
-            child: Center(
-                child: ListView(children: [
-              DestinationBlock(
-                vehicleId: _destinationTwo!.vehicleId,
-                color: 0xFFA6A1C7,
-                title: "Next bus is at ${_destinationTwo!.timeString}",
-              ),
-              ToDestination(destination: _destinationTwo),
-              DestinationBlock(
-                vehicleId: _closestPoint.string,
-                color: 0xFF514C5E,
-                title: "You are at",
-              ),
-              ToDestination(
-                destination: _destinationOne,
-              ),
-              DestinationBlock(
-                vehicleId: _destinationOne!.vehicleId,
-                color: 0xFFA6A1C7,
-                title: "Next bus is at ${_destinationOne!.timeString}",
-              ),
-            ])));
+        return LayoutBuilder(builder: (context, constraints) {
+          return RefreshIndicator(
+              color: const Color(0xFF514C5E),
+              onRefresh: () =>
+                  _getClosestPoint(snapshot.data!).then((value) => setState(() {
+                        _destinationOne = value[0];
+                        _destinationTwo = value[1];
+                      })),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        DestinationBlock(
+                          vehicleId: _destinationTwo!.vehicleId,
+                          color: 0xFFA6A1C7,
+                          title:
+                              "Next bus is at ${_destinationTwo!.timeString}",
+                        ),
+                        ToDestination(destination: _destinationTwo),
+                        DestinationBlock(
+                          vehicleId: _closestPoint.string,
+                          color: 0xFF514C5E,
+                          title: "You are at",
+                        ),
+                        ToDestination(
+                          destination: _destinationOne,
+                        ),
+                        DestinationBlock(
+                          vehicleId: _destinationOne!.vehicleId,
+                          color: 0xFFA6A1C7,
+                          title:
+                              "Next bus is at ${_destinationOne!.timeString}",
+                        ),
+                      ]),
+                ),
+              ));
+        });
       },
     );
   }
