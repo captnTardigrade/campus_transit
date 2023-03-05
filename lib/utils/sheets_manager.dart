@@ -37,7 +37,7 @@ class TransportScheduleRow {
 
   String get sourceString => source.string;
   String get destinationString => destination.string;
-  String get timeString => DateFormat.Hm().format(time);
+  String get timeString => DateFormat.jm().format(time);
 }
 
 class TransportScheduleSheetManager {

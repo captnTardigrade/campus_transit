@@ -33,7 +33,7 @@ class _GetLocationState extends State<GetLocation> with WidgetsBindingObserver {
 
   late Future<Position> _initLocation;
 
-  LocationPermission? _permission;
+  bool _openedSettings = false;
 
   @override
   void initState() {
@@ -44,27 +44,11 @@ class _GetLocationState extends State<GetLocation> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      Geolocator.isLocationServiceEnabled().then((value) {
-        if (value) return;
-        setState(() {
-          _initLocation = _initializeLocation();
-        });
+    if (state == AppLifecycleState.resumed && _openedSettings) {
+      setState(() {
+        _initLocation = _initializeLocation();
       });
-
-      Geolocator.checkPermission().then((value) {
-        if (value == LocationPermission.deniedForever ||
-            value == LocationPermission.denied) {
-          setState(() {
-            _permission = value;
-          });
-          return;
-        }
-        setState(() {
-          _permission = value;
-          _initLocation = _initializeLocation();
-        });
-      });
+      _openedSettings = false;
     }
     super.didChangeAppLifecycleState(state);
   }
@@ -77,7 +61,6 @@ class _GetLocationState extends State<GetLocation> with WidgetsBindingObserver {
 
   Future<Position> _initializeLocation() async {
     bool serviceEnabled = false;
-    LocationPermission permission = LocationPermission.denied;
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -85,7 +68,7 @@ class _GetLocationState extends State<GetLocation> with WidgetsBindingObserver {
           LocationErrorType.serviceDisabled));
     }
 
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
@@ -138,11 +121,17 @@ class _GetLocationState extends State<GetLocation> with WidgetsBindingObserver {
   }
 
   Future<void> _enableLocationServices() async {
-    await Geolocator.openLocationSettings();
+    final openedSettings = await Geolocator.openLocationSettings();
+    setState(() {
+      _openedSettings = openedSettings;
+    });
   }
 
-  Future<LocationPermission> _requestLocationPermission() async {
-    return await Geolocator.requestPermission();
+  Future<void> _requestLocationPermission() async {
+    await Geolocator.requestPermission();
+    setState(() {
+      _initLocation = _initializeLocation();
+    });
   }
 
   @override
@@ -150,15 +139,6 @@ class _GetLocationState extends State<GetLocation> with WidgetsBindingObserver {
     return FutureBuilder(
       future: _initLocation,
       builder: (ctx, snapshot) {
-        if (_permission != null &&
-                _permission == LocationPermission.deniedForever ||
-            _permission == LocationPermission.denied) {
-          return ErrorButton(
-            error: "Please enable location permissions through settings",
-            buttonText: "Open Settings",
-            callBack: () => Geolocator.openAppSettings(),
-          );
-        }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: CircularProgressIndicator(),
@@ -175,11 +155,7 @@ class _GetLocationState extends State<GetLocation> with WidgetsBindingObserver {
 
           if (errorData.type == LocationErrorType.serviceDisabled) {
             return ErrorButton(
-              callBack: () => _enableLocationServices().then((_) {
-                setState(
-                  () {},
-                );
-              }),
+              callBack: _enableLocationServices,
               buttonText: "Enable Location Services",
               error: "Location services are disabled",
             );
@@ -187,25 +163,21 @@ class _GetLocationState extends State<GetLocation> with WidgetsBindingObserver {
 
           if (errorData.type == LocationErrorType.permissionDenied) {
             return ErrorButton(
-              callBack: () => _requestLocationPermission().then((val) {
-                if (val == LocationPermission.deniedForever ||
-                    val == LocationPermission.denied) {
-                  return;
-                }
-                setState(
-                  () {
-                    _initLocation = _initializeLocation();
-                  },
-                );
-              }),
+              callBack: _requestLocationPermission,
               buttonText: "Grant Location Permission",
               error: "Location permissions are denied",
             );
           }
 
           if (errorData.type == LocationErrorType.permissionDeniedForever) {
-            return const Center(
-              child: Text("Please grant location permission through settings."),
+            return ErrorButton(
+              callBack: () =>
+                  Geolocator.openAppSettings().then((value) => setState(() {
+                        _openedSettings = value;
+                      })),
+              buttonText: "Enable Location Services",
+              error:
+                  "Please grant location permissions from settings to use this app",
             );
           }
 
@@ -238,14 +210,14 @@ class _GetLocationState extends State<GetLocation> with WidgetsBindingObserver {
                       children: [
                         DestinationBlock(
                           vehicleId: _destinationTwo!.vehicleId,
-                          color: 0xFFA6A1C7,
+                          color: Theme.of(context).primaryColor,
                           title:
                               "Next bus is at ${_destinationTwo!.timeString}",
                         ),
                         ToDestination(destination: _destinationTwo),
                         DestinationBlock(
                           vehicleId: _closestPoint.string,
-                          color: 0xFF514C5E,
+                          color: Theme.of(context).cardColor,
                           title: "You are at",
                         ),
                         ToDestination(
@@ -253,7 +225,7 @@ class _GetLocationState extends State<GetLocation> with WidgetsBindingObserver {
                         ),
                         DestinationBlock(
                           vehicleId: _destinationOne!.vehicleId,
-                          color: 0xFFA6A1C7,
+                          color: Theme.of(context).primaryColor,
                           title:
                               "Next bus is at ${_destinationOne!.timeString}",
                         ),

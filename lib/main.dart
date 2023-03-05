@@ -24,6 +24,8 @@ class MyApp extends StatelessWidget {
           backgroundColor: const Color(0xFFEFEFEF),
           primarySwatch: createMaterialColor(const Color(0xFF514C5E)),
         ),
+        cardColor: const Color(0xff504C5D),
+        primaryColor: const Color(0xffA6A1C7),
       ),
       home: const MyHomePage(title: 'CampusTransit'),
     );

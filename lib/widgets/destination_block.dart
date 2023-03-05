@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class DestinationBlock extends StatelessWidget {
   final String title;
   final String vehicleId;
-  final int color;
+  final Color color;
 
   const DestinationBlock(
       {super.key,
@@ -19,7 +19,7 @@ class DestinationBlock extends StatelessWidget {
         height: 100,
         margin: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Color(color),
+          color: color,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
