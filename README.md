@@ -1,16 +1,9 @@
-# campus_transit
+# Campus Transit
 
-A new Flutter project.
+An app that solves my minor inconvenience of checking the transport schedule to determine which bus is next.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## TODO
+- [ ] Refactor the display widget when the location permission is denied forever
+- [ ] Caching mechanism to avoid reading from the excel sheet all the time
+- [ ] Add UI button options to choose a starting point instead of relying on location
+- [ ] Use `Geolocator.distanceBetween` instaed of the custom method for a better distance computation
